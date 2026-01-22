@@ -3,67 +3,101 @@
 #include "graphs.h"
 
 /**
- * graph_add_vertex - Adds a vertex to an existing graph
- * @graph: Pointer to the graph to add the vertex to
- * @str:   String to store in the new vertex (will be duplicated)
+ * content_exists - Checks if content already exists in the vertex list
+ * @head: Pointer to the first vertex
+ * @str: String to search for
  *
- * Description: Creates a new vertex with a copy of the given string.
- *              Checks for duplicate content (case-sensitive).
- *              Inserts the vertex at the end of the list so that
- *              vertices appear in the order they were added.
- *
- * Return: Pointer to the created vertex, or NULL on failure
- *         (invalid input, allocation failure, or duplicate content)
+ * Return: 1 if found, 0 otherwise
  */
-vertex_t *graph_add_vertex(graph_t *graph, const char *str)
+static int content_exists(const vertex_t *head, const char *str)
 {
-	vertex_t *new_v;
-	vertex_t *current;
-	char *content_copy;
+	const vertex_t *tmp = head;
 
-	if (graph == NULL || str == NULL)
+	while (tmp)
+	{
+		if (strcmp(tmp->content, str) == 0)
+			return (1);
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
+/**
+ * create_vertex - Allocates and initializes a new vertex
+ * @str: Content string (will be duplicated)
+ * @index: Index to assign
+ *
+ * Return: New vertex pointer, or NULL on failure
+ */
+static vertex_t *create_vertex(const char *str, size_t index)
+{
+	vertex_t *v = calloc(1, sizeof(vertex_t));
+	char *copy;
+
+	if (!v)
 		return (NULL);
 
-	/* Reject duplicates — content must be unique */
-	current = graph->vertices;
-	while (current != NULL)
+	copy = strdup(str);
+	if (!copy)
 	{
-		if (strcmp(current->content, str) == 0)
-			return (NULL);
-		current = current->next;
+		free(v);
+		return (NULL);
 	}
 
-	content_copy = strdup(str);
-	if (content_copy == NULL)
-		return (NULL);
+	v->content = copy;
+	v->index = index;
+	v->nb_edges = 0;
+	v->edges = NULL;
+	v->next = NULL;
 
-	new_v = calloc(1, sizeof(vertex_t));
-	if (new_v == NULL)
+	return (v);
+}
+
+/**
+ * append_vertex - Appends vertex to the end of the list
+ * @graph: Graph to modify
+ * @v: Vertex to append
+ */
+static void append_vertex(graph_t *graph, vertex_t *v)
+{
+	vertex_t *tmp;
+
+	if (!graph->vertices)
 	{
-		free(content_copy);
-		return (NULL);
-	}
-
-	new_v->content = content_copy;
-	new_v->index   = graph->nb_vertices;
-	new_v->nb_edges = 0;
-	new_v->edges   = NULL;
-	new_v->next    = NULL;
-
-	/* Insert at tail (preserves chronological order) */
-	if (graph->vertices == NULL)
-	{
-		graph->vertices = new_v;
+		graph->vertices = v;
 	}
 	else
 	{
-		current = graph->vertices;
-		while (current->next != NULL)
-			current = current->next;
-		current->next = new_v;
+		tmp = graph->vertices;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = v;
 	}
-
 	graph->nb_vertices++;
+}
 
-	return (new_v);
+/**
+ * graph_add_vertex - Adds a vertex to an existing graph
+ * @graph: Pointer to the graph
+ * @str: String to store in the new vertex
+ *
+ * Return: Pointer to the created vertex, or NULL on failure
+ */
+vertex_t *graph_add_vertex(graph_t *graph, const char *str)
+{
+	vertex_t *v;
+
+	if (!graph || !str)
+		return (NULL);
+
+	if (content_exists(graph->vertices, str))
+		return (NULL);
+
+	v = create_vertex(str, graph->nb_vertices);
+	if (!v)
+		return (NULL);
+
+	append_vertex(graph, v);
+
+	return (v);
 }
