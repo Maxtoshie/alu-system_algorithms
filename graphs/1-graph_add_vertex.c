@@ -1,31 +1,46 @@
+#include <stdlib.h>
+#include <string.h>
 #include "graphs.h"
 
 /**
- * graph_add_vertex - allocates and initializes vertex_t in graph_t
- * @graph: graph_t where we add vertex_t
- * @str: value at new vertex_t in @graph
- * Return: pointer to new vertex_t, or NULL on failure
+ * graph_add_vertex - Adds a vertex to an existing graph
+ * @graph: Pointer to the graph
+ * @str: String to store in the new vertex
+ *
+ * Return: Pointer to the created vertex, or NULL on failure
  */
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
-	vertex_t *v = calloc(1, sizeof(vertex_t));
-	vertex_t *prev, *curr = graph ? graph->vertices : NULL;
+	vertex_t *vertex, *tmp;
+	char *copy;
 
-	if (!graph || !str || !*str || !v)
-		goto fail;
-	if (!curr)
-		graph->vertices = v;
-	else
+	if (!graph || !str)
+		return (NULL);
+
+	/* Check for duplicate vertex */
+	for (tmp = graph->vertices; tmp; tmp = tmp->next)
 	{
-		for (prev = curr; curr; prev = curr, curr = curr->next)
-			if (!strcmp(curr->content, str))
-				goto fail;
-		prev->next = v;
+		if (strcmp(tmp->content, str) == 0)
+			return (NULL);
 	}
-	v->index = graph->nb_vertices++;
-	v->content = strdup(str);
-	return (v);
-fail:
-	free(v);
-	return (NULL);
+
+	copy = strdup(str);
+	if (!copy)
+		return (NULL);
+
+	vertex = calloc(1, sizeof(vertex_t));
+	if (!vertex)
+	{
+		free(copy);
+		return (NULL);
+	}
+
+	vertex->content = copy;
+	vertex->index = graph->nb_vertices;
+	vertex->next = graph->vertices;
+
+	graph->vertices = vertex;
+	graph->nb_vertices++;
+
+	return (vertex);
 }
