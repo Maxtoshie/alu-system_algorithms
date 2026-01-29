@@ -49,19 +49,23 @@ void binary_tree_print(const binary_tree_node_t *root,
 
 /**
  * SWAP - Swap two variables
+ * @a: First variable
+ * @b: Second variable
  */
-#define SWAP(a, b)             \
-	do {                   \
+#define SWAP(a, b)              \
+	do {                    \
 		typeof(a) tmp = (a); \
-		(a) = (b);         \
-		(b) = tmp;         \
+		(a) = (b);           \
+		(b) = tmp;           \
 	} while (0)
 
 /**
  * DATASWAP - Swap data fields of two nodes
+ * @a: First node
+ * @b: Second node
  */
-#define DATASWAP(a, b)            \
-	do {                      \
+#define DATASWAP(a, b)             \
+	do {                       \
 		void *tmp = (a)->data; \
 		(a)->data = (b)->data; \
 		(b)->data = tmp;       \
