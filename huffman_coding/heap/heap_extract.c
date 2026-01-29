@@ -1,7 +1,11 @@
 #include "heap.h"
 #include <stdlib.h>
 
-/* Helper: restore heap property from root downwards */
+/**
+ * heapify - restores heap property from root downwards
+ * @root: node_t root of heap subtree
+ * @data_cmp: comparison function for node data
+ */
 static void heapify(node_t *root, int (*data_cmp)(void *, void *))
 {
 	if (!root || !root->left || !data_cmp)
@@ -21,21 +25,28 @@ static void heapify(node_t *root, int (*data_cmp)(void *, void *))
 	}
 }
 
-/* Helper: convert heap tree to array (optional, can suppress unused warnings) */
+/**
+ * heap_to_array - converts heap tree to array while calculating size
+ * @array: buffer to store heap nodes
+ * @root: root node of heap subtree
+ * @i: index in array
+ * Return: size_t size of heap
+ */
 static size_t heap_to_array(node_t **array, node_t *root, size_t i)
 {
 	if (!root || !array)
-		return 0;
+		return (0);
 
 	array[i] = root;
-	return 1 + heap_to_array(array, root->left, 2 * i + 1)
-		+ heap_to_array(array, root->right, 2 * i + 2);
+
+	return (1 + heap_to_array(array, root->left, 2 * i + 1)
+			+ heap_to_array(array, root->right, 2 * i + 2));
 }
 
 /**
  * heap_extract - extracts the root value of a Min Binary Heap
  * @heap: heap_t pointer
- * Return: generic pointer to data that was stored in heap's root, or NULL
+ * Return: pointer to data stored in heap's root or NULL
  */
 void *heap_extract(heap_t *heap)
 {
@@ -43,22 +54,20 @@ void *heap_extract(heap_t *heap)
 	void *data;
 
 	if (!heap || !heap->root)
-		return NULL;
+		return (NULL);
 
-	/* convert heap to array */
 	if (heap->size != heap_to_array(a, heap->root, 0))
-		return NULL;
+		return (NULL);
 
 	data = heap->root->data;
 	last = a[heap->size - 1];
 
 	if (heap->root == last)
-	{
 		heap->root = NULL;
-	}
 	else
 	{
 		heap->root->data = last->data;
+
 		if (last->parent->left == last)
 			last->parent->left = NULL;
 		else
@@ -70,5 +79,5 @@ void *heap_extract(heap_t *heap)
 	free(last);
 	heap->size--;
 
-	return data;
+	return (data);
 }
