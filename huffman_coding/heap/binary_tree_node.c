@@ -1,18 +1,28 @@
 #include <stdlib.h>
-#include <string.h>
-
 #include "heap.h"
 
 /**
- * binary_tree_node - creates a generic binary node with no children
- * @parent: parent node to new node
- * @data: void pointer to generic key value for new node
- * Return: pointer to new node or NULL on failure
+ * binary_tree_node - creates a generic binary tree node
+ * @parent: Pointer to the parent node
+ * @data: Data to store in the node
+ *
+ * Return: Pointer to the created node, or NULL on failure
  */
 binary_tree_node_t *binary_tree_node(binary_tree_node_t *parent, void *data)
-{C99(
-	binary_tree_node_t src = (binary_tree_node_t){data, NULL, NULL, parent};
-	binary_tree_node_t *dst = calloc(1, sizeof(*dst));
-	if (!dst || !data) { free(dst); return (NULL);}
-	return (memcpy(dst, &src, sizeof(src)));
-);}
+{
+	binary_tree_node_t *node;
+
+	if (data == NULL)
+		return (NULL);
+
+	node = malloc(sizeof(binary_tree_node_t));
+	if (node == NULL)
+		return (NULL);
+
+	node->data = data;
+	node->left = NULL;
+	node->right = NULL;
+	node->parent = parent;
+
+	return (node);
+}
