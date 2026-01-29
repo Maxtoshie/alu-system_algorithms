@@ -8,7 +8,13 @@
  */
 heap_t *heap_create(int (*data_cmp)(void *, void *))
 {
-	heap_t *h = calloc(1, sizeof(heap_t));
-	if (h) h->data_cmp = data_cmp;
+	heap_t *h;
+
+	h = calloc(1, sizeof(heap_t));
+	if (h == NULL)
+		return (NULL);
+
+	h->data_cmp = data_cmp;
+
 	return (h);
 }
